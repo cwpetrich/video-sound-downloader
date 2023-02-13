@@ -105,7 +105,14 @@ public class Program
             var streamManifest = await youtubeClient.Videos.Streams.GetManifestAsync(url);
 
             // ...or highest bitrate audio-only stream
-            var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+            var streamInfo = streamManifest
+                .GetAudioOnlyStreams()
+                .GetWithHighestBitrate();
+
+            if (streamInfo == null)
+            {
+                throw new Exception("There weren't any sound containers.");
+            }
 
             await youtubeClient.Videos.Streams.DownloadAsync(streamInfo, $"{name ?? "audio"}.{streamInfo.Container}");
         }
