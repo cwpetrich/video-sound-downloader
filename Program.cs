@@ -8,20 +8,20 @@ public class Program
     {
         var youtubeClient = new YoutubeClient();
 
-        var argument = new Argument<string[]>("Urls", "These are the urls of videos found on youtube that you want to download.");
+        var urls = new Argument<string[]>("Urls", "These are the urls of videos found on youtube that you want to download.");
         var audioOption = new Option<bool>("--audio", "Download only the audio of the given url.");
         var videoOption = new Option<bool>("--video", "Download only the video of the given url.");
         var outputOption = new Option<string?>(new string[]{"-o","--output"}, () => null, "The path to the directory where the output should be sent.");
         var nameOption = new Option<string?>(new string[]{"-n","--name"}, () => null, "The name of the file.");
 
         var rootCommand = new RootCommand();
-        rootCommand.AddArgument(argument);
+        rootCommand.AddArgument(urls);
         rootCommand.AddOption(audioOption);
         rootCommand.AddOption(videoOption);
         rootCommand.AddOption(outputOption);
         rootCommand.AddOption(nameOption);
 
-        rootCommand.SetHandler(async (argumentValue, audioValue, videoValue, outputValue, nameValue) =>
+        rootCommand.SetHandler(async (urls, audioValue, videoValue, outputValue, nameValue) =>
         {
             if (string.IsNullOrWhiteSpace(outputValue))
             {
@@ -44,22 +44,22 @@ public class Program
 
             if (!audioValue && !videoValue)
             {
-                await GetVideoWithAudio(youtubeClient, argumentValue, nameValue);
+                await GetVideoWithAudio(youtubeClient, urls, nameValue);
             }
             else
             {
                 if (audioValue)
                 {
-                    await GetAudio(youtubeClient, argumentValue, nameValue);
+                    await GetAudio(youtubeClient, urls, nameValue);
                 }
 
                 if (videoValue)
                 {
-                    await GetVideo(youtubeClient, argumentValue, nameValue);
+                    await GetVideo(youtubeClient, urls, nameValue);
                 }
             }
 
-        }, argument, audioOption, videoOption, outputOption, nameOption);
+        }, urls, audioOption, videoOption, outputOption, nameOption);
 
         await rootCommand.InvokeAsync(args);
     }
